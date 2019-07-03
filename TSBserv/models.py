@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from django.db.models.signals import post_init
+from django.db.models.signals import post_save
 
 class UserStormEvent(models.Model):
     active = models.BooleanField(default=False)
@@ -37,9 +37,3 @@ class User(models.Model):
         self.latitude = latitude
         self.longitude = longitude
         self.save()
-
-def UserAddUserStormEventObject(**kwargs):
-   instance = kwargs.get('instance')
-   instance.stormEvent = UserStormEvent.objects.create()
-
-post_init.connect(UserAddUserStormEventObject, User)

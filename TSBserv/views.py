@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import User
+from .models import *
 from TSB.local_settings import *
 from .classes.weatherApiHandler import WeatherApiHandler
 from .classes.messengerApiHandler import MessengerApiHandler
@@ -18,12 +18,14 @@ def SendNotifications(request):
         ip = request.META.get('REMOTE_ADDR')
     if ip not in ALLOWED_API_REQUEST_IP:
         return HttpResponse("Access denied")
+
     for user in User.objects.all():
         print(user.stormEvent.active)
         print(user.stormEvent.updatedAt)
         print(user.stormEvent.distance)
         print(user.stormEvent.latitudeDirection)
         print(user.stormEvent.lontitudeDirection)
+        print(user.dateJoined)
         if user.stormEvent.active and (timezone.now()-user.stormEvent.updatedAt).seconds < 300:
             continue
         apiRequest = WeatherApiHandler().Request("lat="+str(user.latitude)+"&lon="+str(user.longitude))
@@ -70,7 +72,7 @@ def IncomingMessage(request):
         if latitude is None or latitude is None:
             return HttpResponse("Empty field(s)")
         if not User.objects.filter(messengerId=messengerId).exists():
-            user = User.objects.create(messengerId=messengerId, latitude=latitude, longitude=longitude)
+            user = User.objects.create(messengerId=messengerId, latitude=latitude, longitude=longitude, stormEvent = UserStormEvent.objects.create())
         else:
             User.objects.get(messengerId=messengerId).UpdateLocation(latitude, longitude)
         r = MessengerApiHandler().SendResponseMessage(messengerId, "Location received. Thank you :).")
