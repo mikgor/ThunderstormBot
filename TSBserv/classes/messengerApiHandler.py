@@ -8,10 +8,9 @@ class MessengerApiHandler:
         return requests.post("https://graph.facebook.com/v2.6/me/messages?access_token="+MESSENGER_API_KEY, json=payload)
 
     def SendAutoResponseMessage(self, recipient, message):
-        message = message.replace("_", " ")
         messages = {
             "hi": "Hello.",
-            "how are you": "I'm fine. Thank you.",
+            "how are you?": "I'm fine. Thank you.",
             "help": "If you want to update your location click the button below."
         }
         answer = ""
